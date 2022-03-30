@@ -29,6 +29,11 @@ function run(string $command): string {
     return trim(shell_exec($command));
 }
 
+function strStartsWith ( $haystack, $needle ) {
+    return strpos( $haystack , $needle ) === 0;
+  }
+  
+
 function str_after(string $subject, string $search): string {
     $pos = strrpos($subject, $search);
 
@@ -41,6 +46,10 @@ function str_after(string $subject, string $search): string {
 
 function slugify(string $subject): string {
     return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $subject), '-'));
+}
+
+function strContains($haystack, $needle) {
+    return $needle !== '' && mb_strpos($haystack, $needle) !== false;
 }
 
 function title_case(string $subject): string {
@@ -121,7 +130,7 @@ if (! confirm('Modify files?', true)) {
     exit(1);
 }
 
-$files = (str_starts_with(strtoupper(PHP_OS), 'WIN') ? replaceForWindows() : replaceForAllOtherOSes());
+$files = (strStartsWith(strtoupper(PHP_OS), 'WIN') ? replaceForWindows() : replaceForAllOtherOSes());
 
 foreach ($files as $file) {
     replace_in_file($file, [
@@ -137,10 +146,15 @@ foreach ($files as $file) {
         ':package_description' => $description,
     ]);
 
-    match (true) {
-        str_contains($file, determineSeparator('src/SkeletonClass.php')) => rename($file, determineSeparator('./src/' . $className . 'Class.php')),
-        str_contains($file, 'README.md') => removeReadmeParagraphs($file),
-        default => [],
+    switch (true) {
+        case strContains($file, determineSeparator('src/SkeletonClass.php')) : 
+            rename($file, determineSeparator('./src/' . $className . 'Class.php'));
+        break;
+       case strContains($file, 'README.md') : 
+         removeReadmeParagraphs($file);
+       break;
+       default:
+         return [];
     };
 
 }
