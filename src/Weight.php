@@ -4,7 +4,7 @@ namespace Prondubuisi\Weightcon;
 
 class Weight
 {
-    protected $kilograms;
+    public static $kilograms;
 
     public function _construct(float $kilograms)
     {
@@ -13,11 +13,17 @@ class Weight
 
     public static function kilograms(float $kilograms)
     {
-        return new static($kilograms);
+        self::$kilograms = $kilograms;
+        return new static();
     }
 
     public function toPounds(): float
+    { 
+        return self::$kilograms * 2.2046;
+    }
+
+    public function toStones(): float
     {
-        return $this->kilograms * 2.0246;
+        return self::$kilograms * 0.15747;
     }
 }
